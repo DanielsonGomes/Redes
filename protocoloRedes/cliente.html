@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cliente WebSocket</title>
+</head>
+<body>
+    <input type="text" id="messageInput" placeholder="Digite sua mensagem aqui">
+    <button onclick="sendMessage()">Enviar</button>
+    <button onclick="disconnect()">Desconectar</button>
+    <script>
+        var ws = new WebSocket('ws://localhost:8080');
+        ws.onopen = function() {
+            console.log('Conectado ao servidor');
+            ws.send('Olá, servidor!');
+        };
+
+        ws.onmessage = function(event) {
+            console.log('Mensagem do servidor: ' + event.data);
+            //alert('O servidor identificou a conexão');  
+        };
+
+        ws.onerror = function(error) {
+            console.log('Erro WebSocket: ' + error);
+        };
+
+        // Definindo um timeout para a confirmação
+        setTimeout(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send('Mensagem com timeout');
+            }
+        }, 3000); // Envia outra mensagem após 3 segundos
+
+        function sendMessage() {
+            var message = document.getElementById('messageInput').value;
+            if (message !== '') {
+                ws.send(message);
+                console.log('Mensagem enviada: ' + message);
+            } else {
+                alert('Por favor, digite uma mensagem antes de enviar.');
+            }
+        }
+
+        function disconnect() {
+            if (ws.readyState === WebSocket.OPEN) {
+                console.log('Desconectado');
+                ws.close(1000, "O usuário solicitou desconexão");
+                
+            }
+        }
+    </script>
+</body>
+</html>
